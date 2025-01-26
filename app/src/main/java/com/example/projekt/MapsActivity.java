@@ -1,28 +1,61 @@
 package com.example.projekt;
 
-import androidx.fragment.app.FragmentActivity;
+import android.Manifest;
+import android.content.pm.PackageManager;
+import android.location.Location;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+import androidx.fragment.app.FragmentActivity;
+
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
+    private FusedLocationProviderClient fusedLocationClient;
+    private LocationCallback locationCallback;
+    private static final int LOCATION_PERMISSION_REQUEST_CODE = 1001;
+    private Marker userMarker;
+    private List<Marker> markers = new ArrayList<>();
+    private boolean isCameraInitialized = false;
+    private Location previousLocation = null;
+
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
+
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+
+        // Sprawdzenie uprawnień
+        if (checkLocationPermission()) {
+            startLocationUpdates();
+        } else {
+            requestLocationPermission();
+        }
 
         // Inicjalizacja mapy
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -37,13 +70,85 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        if (checkLocationPermission()) {
+            mMap.setMyLocationEnabled(true);
+        }
+    }
 
-        // Ustawienie kamery na Białystok
-        LatLng bialystok = new LatLng(53.1325, 23.1688);
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(bialystok, 13));
+    private boolean checkLocationPermission() {
+        return ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
+    }
 
-        // Szukaj sklepów Biedronka
-        searchBiedronkaStores(bialystok);
+    private void requestLocationPermission() {
+        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_PERMISSION_REQUEST_CODE);
+    }
+
+    private void startLocationUpdates() {
+        if (checkLocationPermission()) {
+            try {
+                LocationRequest locationRequest = LocationRequest.create();
+                locationRequest.setInterval(5000);  // Aktualizacja co 5 sekund
+                locationRequest.setFastestInterval(2000);
+                locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+
+                locationCallback = new LocationCallback() {
+                    @Override
+                    public void onLocationResult(LocationResult locationResult) {
+                        if (locationResult == null) {
+                            return;
+                        }
+                        for (Location location : locationResult.getLocations()) {
+                            updateMapWithLocation(location);
+                        }
+                    }
+                };
+
+                fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, null);
+            } catch (SecurityException e) {
+                Toast.makeText(this, "Brak uprawnień do uzyskania lokalizacji.", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    private void updateMapWithLocation(Location location) {
+        LatLng myLocation = new LatLng(location.getLatitude(), location.getLongitude());
+
+        // Sprawdzenie, czy lokalizacja jest inna niż poprzednia
+        if (previousLocation == null || location.distanceTo(previousLocation) > 5) { // Odległość większa niż 5 metrów
+            // Usuń wszystkie poprzednie znaczniki
+            for (Marker marker : markers) {
+                marker.remove();
+            }
+            markers.clear();
+
+            // Przesuń kamerę do nowej lokalizacji z przybliżeniem 18
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(myLocation, 18));
+
+            // Zaktualizuj poprzednią lokalizację
+            previousLocation = location;
+
+            // Szukaj sklepów Biedronka w nowej lokalizacji
+            searchBiedronkaStores(myLocation);
+        } else {
+            // Tylko aktualizacja pozycji kamery bez zmiany przybliżenia
+            mMap.animateCamera(CameraUpdateFactory.newLatLng(myLocation));
+        }
+    }
+
+
+
+
+    // Obsługa żądania uprawnień
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                startLocationUpdates();
+            } else {
+                Toast.makeText(this, "Brak uprawnień do lokalizacji", Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 
     private void searchBiedronkaStores(LatLng location) {
@@ -57,9 +162,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             try {
                 String response = HttpHandler.makeServiceCall(url);
                 if (response != null) {
-                    // Logowanie odpowiedzi
-                    Log.d("GooglePlacesAPI", response);
-
                     JSONObject jsonObject = new JSONObject(response);
                     JSONArray results = jsonObject.getJSONArray("results");
 
@@ -72,14 +174,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             double lat = geometry.getDouble("lat");
                             double lng = geometry.getDouble("lng");
 
-                            // Logowanie nazwy sklepu i współrzędnych
-                            Log.d("PlaceInfo", "Name: " + name + ", Lat: " + lat + ", Lng: " + lng);
-
-                            // Dodanie markera na mapie
                             runOnUiThread(() -> {
-                                mMap.addMarker(new MarkerOptions()
+                                Marker marker = mMap.addMarker(new MarkerOptions()
                                         .position(new LatLng(lat, lng))
                                         .title(name));
+                                // Dodaj nowy znacznik do listy
+                                if (marker != null) {
+                                    markers.add(marker);
+                                }
                             });
                         }
                     } else {
@@ -87,8 +189,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             Toast.makeText(MapsActivity.this, "Brak sklepów Biedronka w pobliżu.", Toast.LENGTH_SHORT).show();
                         });
                     }
-                } else {
-                    Log.d("GooglePlacesAPI", "Brak odpowiedzi z API");
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -100,4 +200,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (fusedLocationClient != null && locationCallback != null) {
+            fusedLocationClient.removeLocationUpdates(locationCallback);
+        }
+    }
 }
