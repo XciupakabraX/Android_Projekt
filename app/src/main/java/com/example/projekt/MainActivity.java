@@ -1,7 +1,12 @@
 package com.example.projekt;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
+import android.app.DatePickerDialog;
 import android.content.Intent;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -13,18 +18,23 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Calendar;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements EditMealDialogFragment.OnMealUpdatedListener {
     private AppDatabase database;
     private MealDao mealDao;
 
-    private EditText editTextName, editTextCalories, editTextDate;
-    private Button btnAddMeal, btnShowMap;
+    private Button btnAddMeal, btnShowMap, btnShowCalendar;
     private RecyclerView recyclerView;
     private MealAdapter mealAdapter;
 
@@ -37,12 +47,12 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+
+
         // Inicjalizacja UI
-        editTextName = findViewById(R.id.editTextName);
-        editTextCalories = findViewById(R.id.editTextCalories);
-        editTextDate = findViewById(R.id.editTextDate);
         btnAddMeal = findViewById(R.id.btnAddMeal);
         btnShowMap = findViewById(R.id.btnShowMap);
+        btnShowCalendar = findViewById(R.id.btnShowCalendar);
         recyclerView = findViewById(R.id.recyclerView);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -52,7 +62,18 @@ public class MainActivity extends AppCompatActivity {
         mealDao = database.mealDao();
 
         // Obsługa dodawania posiłków
-        btnAddMeal.setOnClickListener(view -> addMeal());
+//        btnAddMeal.setOnClickListener(view -> addMeal());
+        btnAddMeal.setOnClickListener(view -> {
+            Intent intent = new Intent(MainActivity.this, AddMealActivity.class);
+            //startActivity(intent);
+            addMealLauncher.launch(intent);
+        });
+
+        btnShowCalendar.setOnClickListener(view -> {
+            Intent intent = new Intent(MainActivity.this, CalendarActivity.class);
+//            startActivity(intent);
+            calendarActivityLauncher.launch(intent);
+        });
 
         // Przycisk do otwierania mapy
         btnShowMap.setOnClickListener(view -> {
@@ -63,41 +84,42 @@ public class MainActivity extends AppCompatActivity {
         // Wczytaj posiłki z bazy danych
         loadMeals();
 
+        setupSwipeToDelete();
+
         // Obsługa czujnika potrząśnięcia
         sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
     }
 
-    private void addMeal() {
-        String name = editTextName.getText().toString().trim();
-        String caloriesStr = editTextCalories.getText().toString().trim();
-        String date = editTextDate.getText().toString().trim();
-
-        if (name.isEmpty() || caloriesStr.isEmpty() || date.isEmpty()) {
-            Toast.makeText(this, "Wypełnij wszystkie pola!", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        int calories = Integer.parseInt(caloriesStr);
-        Meal meal = new Meal(name, calories, date);
-
+    private void deleteMeal(Meal meal) {
         new Thread(() -> {
-            mealDao.insert(meal);
+            mealDao.delete(meal);
+
+            // Odświeżenie listy posiłków po usunięciu
             runOnUiThread(() -> {
-                Toast.makeText(this, "Dodano posiłek!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Usunięto posiłek!", Toast.LENGTH_SHORT).show();
                 loadMeals();
             });
         }).start();
     }
-
     private void loadMeals() {
+        LocalDate today = LocalDate.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/M/d");
+        String todayDate = today.format(formatter);
+
         new Thread(() -> {
-            List<Meal> meals = mealDao.getMealsByDate("2024-01-20");
+            List<Meal> meals = mealDao.getMealsByDate(todayDate);
             runOnUiThread(() -> {
-                mealAdapter = new MealAdapter(meals);
+//                mealAdapter = new MealAdapter(meals);
+                mealAdapter = new MealAdapter(meals, meal -> {
+                    EditMealDialogFragment dialog = EditMealDialogFragment.newInstance(meal);
+                    dialog.show(getSupportFragmentManager(), "EditMealDialog");
+                });
                 recyclerView.setAdapter(mealAdapter);
             });
         }).start();
     }
+
+
 
     @Override
     protected void onResume() {
@@ -139,4 +161,74 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onAccuracyChanged(Sensor sensor, int accuracy) {}
     };
+
+    private final ActivityResultLauncher<Intent> addMealLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                if (result.getResultCode() == RESULT_OK) {
+                    // Odswież listę po dodaniu nowego posiłku
+                    loadMeals();
+                }
+                else if (result.getResultCode() == RESULT_CANCELED) {
+                    Toast.makeText(this, "Dodawanie anulowane", Toast.LENGTH_SHORT).show();
+                }
+            }
+    );
+
+    private void setupSwipeToDelete() {
+        ItemTouchHelper.SimpleCallback simpleCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
+            @Override
+            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+                // Nie implementujemy przesuwania w górę/dół
+                return false;
+            }
+
+            @Override
+            public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
+                int position = viewHolder.getAdapterPosition();
+                Meal mealToDelete = mealAdapter.getMeals().get(position);
+
+                new AlertDialog.Builder(MainActivity.this)
+                        .setTitle("Usuń posiłek")
+                        .setMessage("Czy na pewno chcesz usunąć ten posiłek?")
+                        .setPositiveButton("Tak", (dialog, which) -> {
+                            // Usuń posiłek
+                            deleteMeal(mealToDelete);
+                            mealAdapter.getMeals().remove(position);
+                            mealAdapter.notifyItemRemoved(position);
+                        })
+                        .setNegativeButton("Nie", (dialog, which) -> {
+                            // Przywróć element
+                            mealAdapter.notifyItemChanged(position);
+                        })
+                        .show();
+            }
+        };
+
+        // Przypisz callback do RecyclerView
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleCallback);
+        itemTouchHelper.attachToRecyclerView(recyclerView);
+    }
+
+    @Override
+    public void onMealUpdated(Meal updatedMeal) {
+        new Thread(() -> {
+            mealDao.update(updatedMeal); // Zapisz zmiany w bazie danych
+            runOnUiThread(() -> loadMeals()); // Odśwież listę
+        }).start();
+    }
+
+    private final ActivityResultLauncher<Intent> calendarActivityLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                if (result.getResultCode() == RESULT_OK) {
+                    // Odswież listę posiłków po powrocie z CalendarActivity
+                    loadMeals();
+                }
+                else if (result.getResultCode() == RESULT_CANCELED) {
+                    // Odswież listę posiłków po powrocie z CalendarActivity
+                    loadMeals();
+                }
+            }
+    );
 }

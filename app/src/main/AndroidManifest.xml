@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
-
     <!-- Uprawnienia wymagane przez aplikację -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
@@ -19,27 +18,27 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Projekt"
         tools:targetApi="31">
-
-        <!-- Główna aktywność aplikacji -->
+        <activity
+            android:name=".CalendarActivity"
+            android:exported="false" />
+        <activity
+            android:name=".AddMealActivity"
+            android:exported="false" /> <!-- Główna aktywność aplikacji -->
         <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
-
-        <!-- Aktywność map Google -->
+        </activity> <!-- Aktywność map Google -->
         <activity
             android:name=".MapsActivity"
-            android:exported="true" />
-
-        <!-- Klucz API Google Maps -->
+            android:exported="true" /> <!-- Klucz API Google Maps -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyDNzsjFrY6CSpHJKSvKA1uRjtyKEdSKPSU" />
-
     </application>
 
 </manifest>

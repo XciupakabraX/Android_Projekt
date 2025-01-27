@@ -5,24 +5,24 @@
     android:orientation="vertical"
     android:padding="16dp">
 
-    <EditText
-        android:id="@+id/editTextName"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Nazwa posiłku" />
+<!--    <EditText-->
+<!--        android:id="@+id/editTextName"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:hint="Nazwa posiłku" />-->
 
-    <EditText
-        android:id="@+id/editTextCalories"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Kalorie"
-        android:inputType="number" />
+<!--    <EditText-->
+<!--        android:id="@+id/editTextCalories"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:hint="Kalorie"-->
+<!--        android:inputType="number" />-->
 
-    <EditText
-        android:id="@+id/editTextDate"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Data (YYYY-MM-DD)" />
+<!--    <EditText-->
+<!--        android:id="@+id/editTextDate"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:hint="Data (YYYY-MM-DD)" />-->
 
     <Button
         android:id="@+id/btnAddMeal"
@@ -35,6 +35,12 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Znajdź sklep" />
+
+    <Button
+        android:id="@+id/btnShowCalendar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Pokaż kalendarz" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
