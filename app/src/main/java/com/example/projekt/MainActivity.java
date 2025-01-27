@@ -13,6 +13,7 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -20,10 +21,15 @@ import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.material.navigation.NavigationView;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -40,12 +46,61 @@ public class MainActivity extends AppCompatActivity implements EditMealDialogFra
 
     private SensorManager sensorManager;
     private float acelVal, acelLast, shake;
+    private DrawerLayout drawerLayout;
+    private NavigationView navigationView;
 
     @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        // Inicjalizacja DrawerLayout i NavigationView
+        drawerLayout = findViewById(R.id.drawer_layout);
+        navigationView = findViewById(R.id.nav_view);
+
+        // Inicjalizacja paska narzędziowego (Toolbar)
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+//        getSupportActionBar().setTitle("Nowy Tytuł");
+
+        // Ustawienie ikony do otwierania menu
+        toolbar.setNavigationIcon(android.R.drawable.ic_menu_sort_by_size);
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Otwarcie DrawerLayout po kliknięciu na ikonę
+                drawerLayout.openDrawer(navigationView);
+            }
+        });
+
+        // Nasłuchiwanie na wybór opcji z menu
+        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                // Sprawdzamy, który element został wybrany
+                if (item.getItemId() == R.id.nav_home) {
+                    // Wybór "Strona główna"
+                    Toast.makeText(MainActivity.this, "Strona główna", Toast.LENGTH_SHORT).show();
+                } else if (item.getItemId() == R.id.nav_calendar) {
+                    Intent intent = new Intent(MainActivity.this, CalendarActivity.class);
+//            startActivity(intent);
+                    calendarActivityLauncher.launch(intent);
+                } else if (item.getItemId() == R.id.nav_add_meal) {
+                    Intent intent = new Intent(MainActivity.this, AddMealActivity.class);
+                    //startActivity(intent);
+                    addMealLauncher.launch(intent);
+                }
+                else if (item.getItemId() == R.id.nav_maps) {
+                    Intent intent = new Intent(MainActivity.this, MapsActivity.class);
+                    startActivity(intent);
+                }
+
+                // Po wybraniu zamykamy Drawer
+                drawerLayout.closeDrawer(navigationView);
+                return true;
+            }
+        });
 
 
 
