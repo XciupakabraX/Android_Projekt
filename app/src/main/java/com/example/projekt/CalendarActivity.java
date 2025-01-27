@@ -51,7 +51,6 @@ public class CalendarActivity extends AppCompatActivity implements EditMealDialo
         mealAdapter = new MealAdapter(mealListForDay, meal -> {
             // Po kliknięciu na posiłek, wywołaj dialog edycji
             showEditMealDialog(meal);
-//            System.out.println("TEST");
         });
         recyclerViewMealsForDay.setAdapter(mealAdapter);
 
@@ -109,8 +108,25 @@ public class CalendarActivity extends AppCompatActivity implements EditMealDialo
     @Override
     public void onMealUpdated(Meal updatedMeal) {
         new Thread(() -> {
+            String currentlySelectedDate = getSelectedDateFromCalendar();
+
             mealDao.update(updatedMeal); // Zapisz zmiany w bazie danych
-            runOnUiThread(() -> loadMealsForDate(updatedMeal.getDate())); // Odśwież listę
+//            runOnUiThread(() -> loadMealsForDate(updatedMeal.getDate())); // Odśwież listę
+            runOnUiThread(() -> {
+                if (updatedMeal.getDate().equals(currentlySelectedDate)) {
+                    // Jeśli posiłek należy do wybranej daty, odśwież listę dla tego dnia
+                    loadMealsForDate(currentlySelectedDate);
+                } else {
+                    // Jeśli zmieniono datę na inną, usuń posiłek z listy aktualnego dnia
+                    for (int i = 0; i < mealListForDay.size(); i++) {
+                        if (mealListForDay.get(i).getId() == updatedMeal.getId()) {
+                            mealListForDay.remove(i);
+                            mealAdapter.notifyItemRemoved(i);
+                            break;
+                        }
+                    }
+                }
+            });
         }).start();
     }
 
@@ -159,5 +175,13 @@ public class CalendarActivity extends AppCompatActivity implements EditMealDialo
         // Przypisz gesty do RecyclerView
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleCallback);
         itemTouchHelper.attachToRecyclerView(recyclerViewMealsForDay);
+    }
+
+    private String getSelectedDateFromCalendar() {
+        long selectedDateMillis = calendarView.getDate();
+        LocalDate selectedDate = LocalDate.ofEpochDay(selectedDateMillis / (24 * 60 * 60 * 1000));
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/M/d");
+        System.out.println(selectedDate.format(formatter));
+        return selectedDate.format(formatter);
     }
 }

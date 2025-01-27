@@ -147,9 +147,14 @@ public class MainActivity extends AppCompatActivity implements EditMealDialogFra
             float delta = acelVal - acelLast;
             shake = shake * 0.9f + delta;
 
+            LocalDate today = LocalDate.now();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/M/d");
+            String todayDate = today.format(formatter);
+
             if (shake > 12) {
                 new Thread(() -> {
-                    mealDao.deleteAll();
+//                    mealDao.deleteAll();
+                    mealDao.deleteByDate(todayDate);
                     runOnUiThread(() -> {
                         Toast.makeText(MainActivity.this, "Lista posiłków została wyczyszczona!", Toast.LENGTH_SHORT).show();
                         loadMeals();

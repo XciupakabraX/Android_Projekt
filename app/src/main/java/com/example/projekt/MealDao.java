@@ -26,6 +26,9 @@ public interface MealDao {
     @Query("DELETE FROM meals")
     void deleteAll();
 
+    @Query("DELETE FROM meals WHERE date= :date")
+    void deleteByDate(String date);
+
     @Update
     void update(Meal meal);
 }

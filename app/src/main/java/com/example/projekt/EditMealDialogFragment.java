@@ -1,5 +1,6 @@
 package com.example.projekt;
 
+import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
@@ -15,7 +16,10 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
+import java.util.Calendar;
+
 public class EditMealDialogFragment extends DialogFragment {
+
 
     public interface OnMealUpdatedListener {
         void onMealUpdated(Meal updatedMeal);
@@ -53,6 +57,7 @@ public class EditMealDialogFragment extends DialogFragment {
         Button btnSave = view.findViewById(R.id.btnSave);
         Button btnCancel = view.findViewById(R.id.btnCancel);
 
+        String dateSave = "";
         // Pobierz posiłek z argumentów
         if (getArguments() != null) {
             meal = (Meal) getArguments().getSerializable("meal");
@@ -60,8 +65,33 @@ public class EditMealDialogFragment extends DialogFragment {
                 editTextName.setText(meal.getName());
                 editTextCalories.setText(String.valueOf(meal.getCalories()));
                 editTextDate.setText(meal.getDate());
+                dateSave = meal.getDate();
             }
         }
+        //
+
+        // Rozdzielenie daty na części
+        String[] parts = dateSave.split("/");
+
+        // Pobranie roku, miesiąca i dnia
+        int year = Integer.parseInt(parts[0]);   // rok
+        int month = Integer.parseInt(parts[1]) - 1; //  miesiąc
+        int day = Integer.parseInt(parts[2]);   // dzień
+
+        editTextDate.setOnClickListener(v -> {
+            DatePickerDialog datePickerDialog = new DatePickerDialog(
+//                    EditMealDialogFragment.this,
+                    requireContext(),
+                    (datePickerView, selectedYear, selectedMonth, selectedDay) -> {
+                        // Wybrana data w formacie
+                        String selectedDate = selectedYear + "/" + (selectedMonth + 1) + "/" + selectedDay;
+                        editTextDate.setText(selectedDate);
+                    },
+                    year, month, day
+            );
+            datePickerDialog.show();
+        });
+        //
 
         // Obsługa przycisku "Zapisz"
         btnSave.setOnClickListener(v -> {

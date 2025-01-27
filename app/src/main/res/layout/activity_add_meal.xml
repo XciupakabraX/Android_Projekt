@@ -13,31 +13,33 @@
         android:id="@+id/editTextName"
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:hint="Nazwa posiłku" />
+        android:hint="@string/meal_name" />
 
     <EditText
         android:id="@+id/editTextCalories"
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:hint="Kalorie"
+        android:hint="@string/meal_calories"
         android:inputType="number" />
 
     <EditText
         android:id="@+id/editTextDate"
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:hint="Data (YYYY-MM-DD)" />
+        android:hint="@string/meal_date"
+        android:inputType="none"
+        android:focusable="false"/>
 
     <Button
         android:id="@+id/btnAddMeal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Dodaj posiłek" />
+        android:text="@string/btn_add_meal" />
 
     <Button
         android:id="@+id/btnCancel"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Anuluj" />
+        android:text="@string/btn_cancel_meal" />
 
 </LinearLayout>
