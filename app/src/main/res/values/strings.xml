@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Projekt</string>
+    <string name="app_name">Nazwa aplikacji</string>
     <string name="open_drawer">Otwórz menu</string>
     <string name="close_drawer">Zamknij menu</string>
     <string name="meal_name">Nazwa posiłku</string>
@@ -12,5 +12,11 @@
     <string name="btn_find_shop">Znajdź sklep</string>
     <string name="btn_show_calendar">Pokaż kalendarz</string>
     <string name="btn_save">Zapisz</string>
+    <string name="add_meal">Dodaj posiłek</string>
+    <string name="calendar">Kalendarz</string>
+    <string name="no_meals">Brak posiłków</string>
+    <string name="today">Dzisiaj</string>
 
+    <string name="home_page">Strona Główna</string>
+    <string name="find_shop">Znajdź sklep</string>
 </resources>

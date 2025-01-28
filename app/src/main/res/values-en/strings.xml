@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Application name</string>
+    <string name="open_drawer">Open menu</string>
+    <string name="close_drawer">Close menu</string>
+    <string name="meal_name">Meal name</string>
+    <string name="meal_calories">Colories</string>
+    <string name="meal_date">Date (YYYY-MM-DD)</string>
+
+    <string name="btn_add_meal">Add meal</string>
+    <string name="btn_cancel_meal">Cancel</string>
+    <string name="btn_back_calendar">Back</string>
+    <string name="btn_find_shop">Find shop</string>
+    <string name="btn_show_calendar">Show calendar</string>
+    <string name="btn_save">Save</string>
+    <string name="add_meal">Add meal</string>
+    <string name="calendar">Calendar</string>
+    <string name="no_meals">No meal</string>
+    <string name="today">Today</string>
+
+    <string name="home_page">Home page</string>
+    <string name="find_shop">Find shop</string>
+</resources>

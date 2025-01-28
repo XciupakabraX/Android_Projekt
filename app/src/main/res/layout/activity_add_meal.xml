@@ -14,7 +14,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:navigationIcon="@drawable/round_arrow_back_ios_24"
-        app:title="Dodaj Posiłek"
+        app:title="@string/add_meal"
         app:titleTextColor="?attr/colorOnPrimary" />
 
     <EditText
@@ -67,13 +67,5 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/editTextDate" />
-
-<!--    <Button-->
-<!--        android:id="@+id/btnCancel"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:text="@string/btn_cancel_meal"-->
-<!--        app:layout_constraintTop_toBottomOf="@+id/btnAddMeal"-->
-<!--        tools:layout_editor_absoluteX="-56dp" />-->
 
 </androidx.constraintlayout.widget.ConstraintLayout>
