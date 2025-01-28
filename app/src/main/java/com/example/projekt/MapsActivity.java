@@ -120,25 +120,23 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         LatLng myLocation = new LatLng(location.getLatitude(), location.getLongitude());
         Log.d("LOCATION_CHANGE", "Aktualizacja mapy dla lokalizacji: " + myLocation);
 
-        if (previousLocation == null || location.distanceTo(previousLocation) > 5) { // Odległość większa niż 5 metrów
-            // Usuń wszystkie poprzednie znaczniki
-            for (Marker marker : markers) {
-                marker.remove();
-            }
-            markers.clear();
-
-            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(myLocation, 18));
+        if (previousLocation == null || location.distanceTo(previousLocation) > 5) {
             previousLocation = location;
+
+            // Przesuń kamerę tylko za pierwszym razem lub jeśli użytkownik tego chce
+            if (!isCameraInitialized) {
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(myLocation, 18));
+                isCameraInitialized = true;
+            }
 
             // Sprawdź, czy odległość od ostatniego wyszukiwania wynosi co najmniej 1 km
             if (lastSearchLocation == null || location.distanceTo(lastSearchLocation) >= 1000) {
                 lastSearchLocation = location;
                 searchBiedronkaStores(myLocation);
             }
-        } else {
-            mMap.animateCamera(CameraUpdateFactory.newLatLng(myLocation));
         }
     }
+
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
