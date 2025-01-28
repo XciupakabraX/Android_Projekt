@@ -64,7 +64,7 @@ dependencies {
     implementation("androidx.recyclerview:recyclerview:1.3.2")
 
     implementation("androidx.room:room-runtime:2.5.0")
-    implementation ("com.google.android.material:material:1.10.0")
+
 
 
 }
