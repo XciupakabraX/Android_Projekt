@@ -14,6 +14,38 @@
         android:layout_height="match_parent">
 
 
+        <!--"?attr/colorPrimary"-->
+        <!-- Zawartość główna -->
+
+<!--        <Button-->
+<!--            android:id="@+id/btnAddMeal"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_below="@+id/recyclerView"-->
+<!--            android:text="@string/btn_add_meal"-->
+<!--            app:layout_constraintBottom_toTopOf="@+id/btnShowMap"-->
+<!--            tools:layout_editor_absoluteX="0dp" />-->
+
+<!--        <Button-->
+<!--            android:id="@+id/btnShowMap"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_below="@+id/btnAddMeal"-->
+<!--            android:text="@string/btn_find_shop"-->
+<!--            app:layout_constraintBottom_toTopOf="@+id/btnShowCalendar"-->
+<!--            tools:layout_editor_absoluteX="0dp" />-->
+
+<!--        <Button-->
+<!--            android:id="@+id/btnShowCalendar"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_below="@+id/btnShowMap"-->
+<!--            android:layout_alignParentBottom="true"-->
+<!--            android:layout_marginBottom="32dp"-->
+<!--            android:text="@string/btn_show_calendar"-->
+<!--            app:layout_constraintBottom_toBottomOf="parent"-->
+<!--            tools:layout_editor_absoluteX="0dp" />-->
+
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
@@ -21,38 +53,21 @@
             android:background="?attr/colorPrimary"
             android:title="AA"
             app:layout_constraintTop_toTopOf="parent"
-            app:navigationIcon="@drawable/baseline_menu_24"/>
+            app:navigationIcon="@drawable/baseline_menu_24"
+            app:titleTextColor="?attr/colorOnPrimary"
+            tools:layout_editor_absoluteX="-16dp" />
 
-        <!-- Zawartość główna -->
-
-        <Button
-            android:id="@+id/btnAddMeal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/recyclerView"
-            android:text="@string/btn_add_meal"
-            app:layout_constraintBottom_toTopOf="@+id/btnShowMap"
-            tools:layout_editor_absoluteX="0dp" />
-
-        <Button
-            android:id="@+id/btnShowMap"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/btnAddMeal"
-            android:text="@string/btn_find_shop"
-            app:layout_constraintBottom_toTopOf="@+id/btnShowCalendar"
-            tools:layout_editor_absoluteX="0dp" />
-
-        <Button
-            android:id="@+id/btnShowCalendar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/btnShowMap"
-            android:layout_alignParentBottom="true"
-            android:layout_marginBottom="32dp"
-            android:text="@string/btn_show_calendar"
-            app:layout_constraintBottom_toBottomOf="parent"
-            tools:layout_editor_absoluteX="0dp" />
+<!--        <ImageView-->
+<!--            android:id="@+id/addNewMeal"-->
+<!--            android:layout_width="40dp"-->
+<!--            android:layout_height="40dp"-->
+<!--            android:layout_centerInParent="true"-->
+<!--            android:layout_marginTop="16dp"-->
+<!--            android:layout_marginEnd="16dp"-->
+<!--            android:src="@drawable/baseline_add_circle_outline_24"-->
+<!--            android:visibility="visible"-->
+<!--            app:layout_constraintEnd_toEndOf="@+id/toolbar"-->
+<!--            app:layout_constraintTop_toTopOf="@+id/toolbar" />-->
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerView"
@@ -60,10 +75,42 @@
             android:layout_height="0dp"
             android:layout_below="@+id/toolbar"
             android:layout_marginTop="4dp"
-            app:layout_constraintBottom_toTopOf="@+id/btnAddMeal"
+            android:layout_marginBottom="4dp"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/toolbar"
             tools:layout_editor_absoluteX="0dp" />
+
+        <ImageView
+            android:id="@+id/emptyListIcon"
+            android:layout_width="200dp"
+            android:layout_height="200dp"
+            android:layout_centerInParent="true"
+            android:src="@drawable/round_fastfood_24"
+            android:visibility="visible"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/toolbar"
+            app:layout_constraintVertical_bias="0.19999999" />
+
+        <TextView
+            android:id="@+id/emptyListText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="4dp"
+            android:text="Brak posiłków"
+            android:textColor="?attr/colorPrimary"
+            android:textSize="30sp"
+            android:textStyle="bold"
+            android:visibility="visible"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/emptyListIcon" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+
 
     <com.google.android.material.navigation.NavigationView
         android:id="@+id/nav_view"

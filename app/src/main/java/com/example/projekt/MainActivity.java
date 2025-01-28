@@ -17,6 +17,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -48,6 +50,11 @@ public class MainActivity extends AppCompatActivity implements EditMealDialogFra
     private float acelVal, acelLast, shake;
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
+    private List<Meal> meals;
+    private ImageView emptyListIcon;
+    private TextView emptyListText;
+//    private ImageView addNewMeal;
+    private boolean isDialogVisible = false;
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -58,6 +65,9 @@ public class MainActivity extends AppCompatActivity implements EditMealDialogFra
         // Inicjalizacja DrawerLayout i NavigationView
         drawerLayout = findViewById(R.id.drawer_layout);
         navigationView = findViewById(R.id.nav_view);
+        emptyListIcon = findViewById(R.id.emptyListIcon);
+        emptyListText = findViewById(R.id.emptyListText);
+//        addNewMeal = findViewById(R.id.addNewMeal);
 
         // Inicjalizacja paska narzędziowego (Toolbar)
         Toolbar toolbar = findViewById(R.id.toolbar);
@@ -66,7 +76,7 @@ public class MainActivity extends AppCompatActivity implements EditMealDialogFra
 
         // Ustawienie ikony do otwierania menu
 //        toolbar.setNavigationIcon(android.R.drawable.ic_menu_sort_by_size);
-        toolbar.setNavigationIcon(R.drawable.baseline_menu_24);
+//        toolbar.setNavigationIcon(R.drawable.baseline_menu_24);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -103,12 +113,18 @@ public class MainActivity extends AppCompatActivity implements EditMealDialogFra
             }
         });
 
+//        addNewMeal.setOnClickListener(view -> {
+//            Intent intent = new Intent(MainActivity.this, AddMealActivity.class);
+//            //startActivity(intent);
+//            addMealLauncher.launch(intent);
+//        });
+
 
 
         // Inicjalizacja UI
-        btnAddMeal = findViewById(R.id.btnAddMeal);
-        btnShowMap = findViewById(R.id.btnShowMap);
-        btnShowCalendar = findViewById(R.id.btnShowCalendar);
+//        btnAddMeal = findViewById(R.id.btnAddMeal);
+//        btnShowMap = findViewById(R.id.btnShowMap);
+//        btnShowCalendar = findViewById(R.id.btnShowCalendar);
         recyclerView = findViewById(R.id.recyclerView);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -119,26 +135,27 @@ public class MainActivity extends AppCompatActivity implements EditMealDialogFra
 
         // Obsługa dodawania posiłków
 //        btnAddMeal.setOnClickListener(view -> addMeal());
-        btnAddMeal.setOnClickListener(view -> {
-            Intent intent = new Intent(MainActivity.this, AddMealActivity.class);
-            //startActivity(intent);
-            addMealLauncher.launch(intent);
-        });
-
-        btnShowCalendar.setOnClickListener(view -> {
-            Intent intent = new Intent(MainActivity.this, CalendarActivity.class);
+//        btnAddMeal.setOnClickListener(view -> {
+//            Intent intent = new Intent(MainActivity.this, AddMealActivity.class);
+//            //startActivity(intent);
+//            addMealLauncher.launch(intent);
+//        });
+//
+//        btnShowCalendar.setOnClickListener(view -> {
+//            Intent intent = new Intent(MainActivity.this, CalendarActivity.class);
+////            startActivity(intent);
+//            calendarActivityLauncher.launch(intent);
+//        });
+//
+//        // Przycisk do otwierania mapy
+//        btnShowMap.setOnClickListener(view -> {
+//            Intent intent = new Intent(MainActivity.this, MapsActivity.class);
 //            startActivity(intent);
-            calendarActivityLauncher.launch(intent);
-        });
-
-        // Przycisk do otwierania mapy
-        btnShowMap.setOnClickListener(view -> {
-            Intent intent = new Intent(MainActivity.this, MapsActivity.class);
-            startActivity(intent);
-        });
+//        });
 
         // Wczytaj posiłki z bazy danych
         loadMeals();
+
 
         setupSwipeToDelete();
 
@@ -163,7 +180,7 @@ public class MainActivity extends AppCompatActivity implements EditMealDialogFra
         String todayDate = today.format(formatter);
 
         new Thread(() -> {
-            List<Meal> meals = mealDao.getMealsByDate(todayDate);
+            meals = mealDao.getMealsByDate(todayDate);
             runOnUiThread(() -> {
 //                mealAdapter = new MealAdapter(meals);
                 mealAdapter = new MealAdapter(meals, meal -> {
@@ -171,6 +188,7 @@ public class MainActivity extends AppCompatActivity implements EditMealDialogFra
                     dialog.show(getSupportFragmentManager(), "EditMealDialog");
                 });
                 recyclerView.setAdapter(mealAdapter);
+                checkIfListIsEmpty();
             });
         }).start();
     }
@@ -207,15 +225,46 @@ public class MainActivity extends AppCompatActivity implements EditMealDialogFra
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/M/d");
             String todayDate = today.format(formatter);
 
-            if (shake > 12) {
-                new Thread(() -> {
-//                    mealDao.deleteAll();
-                    mealDao.deleteByDate(todayDate);
-                    runOnUiThread(() -> {
-                        Toast.makeText(MainActivity.this, "Lista posiłków została wyczyszczona!", Toast.LENGTH_SHORT).show();
-                        loadMeals();
-                    });
-                }).start();
+//            if (shake > 12) {
+//                new Thread(() -> {
+////                    mealDao.deleteAll();
+//                    mealDao.deleteByDate(todayDate);
+//                    runOnUiThread(() -> {
+//                        Toast.makeText(MainActivity.this, "Lista posiłków została wyczyszczona!", Toast.LENGTH_SHORT).show();
+//                        loadMeals();
+//                    });
+//                }).start();
+//            }
+            if (shake > 12 && !(isDialogVisible) && !(meals.isEmpty())) {
+                runOnUiThread(() -> {
+                    isDialogVisible = true;
+                    // Tworzenie okna dialogowego potwierdzenia
+                    new AlertDialog.Builder(MainActivity.this)
+                            .setTitle("Usunięcie posiłków")
+                            .setMessage("Czy na pewno chcesz wyczyścić listę posiłków?")
+                            .setPositiveButton("Tak", (dialog, which) -> {
+                                // Akcja po potwierdzeniu
+                                new Thread(() -> {
+                                    // Usuń dane z bazy
+                                    mealDao.deleteByDate(todayDate);
+                                    runOnUiThread(() -> {
+                                        Toast.makeText(MainActivity.this, "Lista posiłków została wyczyszczona!", Toast.LENGTH_SHORT).show();
+                                        loadMeals();
+                                    });
+                                }).start();
+                                isDialogVisible = false;
+                            })
+                            .setNegativeButton("Nie", (dialog, which) -> {
+                                // Zamknięcie dialogu, gdy użytkownik kliknie "Nie"
+                                dialog.dismiss();
+                                isDialogVisible = false;
+                            })
+                            .setOnCancelListener(dialog -> {
+                                // Obsługa anulowania dialogu (np. kliknięcie poza dialogiem)
+                                isDialogVisible = false;
+                            })
+                            .show();
+                });
             }
         }
 
@@ -292,4 +341,18 @@ public class MainActivity extends AppCompatActivity implements EditMealDialogFra
                 }
             }
     );
+
+    private void checkIfListIsEmpty() {
+        if (meals.isEmpty()) {
+            // Jeśli lista jest pusta, pokaż ikonę
+            emptyListIcon.setVisibility(View.VISIBLE);
+            emptyListText.setVisibility(View.VISIBLE);
+            recyclerView.setVisibility(View.GONE);
+        } else {
+            // Jeśli lista nie jest pusta, ukryj ikonę
+            emptyListIcon.setVisibility(View.GONE);
+            emptyListText.setVisibility(View.GONE);
+            recyclerView.setVisibility(View.VISIBLE);
+        }
+    }
 }

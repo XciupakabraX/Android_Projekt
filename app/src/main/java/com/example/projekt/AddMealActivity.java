@@ -1,10 +1,14 @@
 package com.example.projekt;
 
 import android.app.DatePickerDialog;
+import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
+import android.util.TypedValue;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+import androidx.appcompat.widget.Toolbar;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -17,39 +21,62 @@ import java.util.Calendar;
 public class AddMealActivity extends AppCompatActivity {
 
     private EditText editTextName, editTextCalories, editTextDate;
-    private Button btnAddMeal, btnCancel;
+    private Button btnAddMeal;
+//    private Button btnCancel;
 
     private AppDatabase database;
     private MealDao mealDao;
 
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
+//        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_add_meal);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
+//        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+//            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+//            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+//            return insets;
+//        });
+
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+//        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        toolbar.setNavigationOnClickListener(v -> {
+            // Przejdź do MainActivity
+            setResult(RESULT_CANCELED);
+            finish();
         });
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+//            // Pobranie koloru z motywu
+//            TypedValue typedValue = new TypedValue();
+//            getTheme().resolveAttribute(android.R.attr.colorPrimary, typedValue, true);
+//            int primaryColor = typedValue.data;
+//
+//            // Ustawienie koloru status baru
+//            getWindow().setStatusBarColor(primaryColor);
+//        }
+
 
         editTextName = findViewById(R.id.editTextName);
         editTextCalories = findViewById(R.id.editTextCalories);
         editTextDate = findViewById(R.id.editTextDate);
         btnAddMeal = findViewById(R.id.btnAddMeal);
-        btnCancel = findViewById(R.id.btnCancel);
+//        btnCancel = findViewById(R.id.btnCancel);
 
         database = AppDatabase.getInstance(this);
         mealDao = database.mealDao();
 
         btnAddMeal.setOnClickListener(view -> addMeal());
 
-        btnCancel.setOnClickListener(view -> {
-            // Zamknij aktywność bez żadnych działań
-            setResult(RESULT_CANCELED);
-            finish();
-        });
+//        btnCancel.setOnClickListener(view -> {
+//            // Zamknij aktywność bez żadnych działań
+//            setResult(RESULT_CANCELED);
+//            finish();
+//        });
 
         //
         Calendar calendar = Calendar.getInstance();

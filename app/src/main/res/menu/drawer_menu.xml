@@ -3,18 +3,18 @@
 
     <item
         android:id="@+id/nav_home"
-        android:icon="@drawable/common_google_signin_btn_icon_dark"
+        android:icon="@drawable/round_home_24"
         android:title="Strona Główna" />
     <item
         android:id="@+id/nav_add_meal"
-        android:icon="@drawable/common_google_signin_btn_icon_dark"
+        android:icon="@drawable/baseline_add_circle_outline_24"
         android:title="Dodaj Posiłek" />
     <item
         android:id="@+id/nav_calendar"
-        android:icon="@drawable/common_google_signin_btn_icon_dark"
+        android:icon="@drawable/baseline_calendar_month_24"
         android:title="Kalendarz" />
     <item
         android:id="@+id/nav_maps"
-        android:icon="@drawable/common_google_signin_btn_icon_dark"
+        android:icon="@drawable/outline_shopping_bag_24"
         android:title="Znajdź sklep" />
 </menu>
