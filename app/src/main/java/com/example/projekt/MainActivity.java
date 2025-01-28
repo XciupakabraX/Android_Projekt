@@ -65,7 +65,8 @@ public class MainActivity extends AppCompatActivity implements EditMealDialogFra
 //        getSupportActionBar().setTitle("Nowy Tytuł");
 
         // Ustawienie ikony do otwierania menu
-        toolbar.setNavigationIcon(android.R.drawable.ic_menu_sort_by_size);
+//        toolbar.setNavigationIcon(android.R.drawable.ic_menu_sort_by_size);
+        toolbar.setNavigationIcon(R.drawable.baseline_menu_24);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -84,7 +85,7 @@ public class MainActivity extends AppCompatActivity implements EditMealDialogFra
                     Toast.makeText(MainActivity.this, "Strona główna", Toast.LENGTH_SHORT).show();
                 } else if (item.getItemId() == R.id.nav_calendar) {
                     Intent intent = new Intent(MainActivity.this, CalendarActivity.class);
-//            startActivity(intent);
+//                    startActivity(intent);
                     calendarActivityLauncher.launch(intent);
                 } else if (item.getItemId() == R.id.nav_add_meal) {
                     Intent intent = new Intent(MainActivity.this, AddMealActivity.class);
