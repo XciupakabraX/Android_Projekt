@@ -1,31 +1,107 @@
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.drawerlayout.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="16dp">
+    android:layout_height="match_parent">
 
+    <!-- Główna zawartość ekranu -->
 
-    <Button
-        android:id="@+id/btnAddMeal"
+    <!-- Navigation Drawer (Rozwijane menu) -->
+
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/btn_add_meal" />
+        android:layout_height="match_parent">
 
-    <Button
-        android:id="@+id/btnShowMap"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/btn_find_shop" />
 
-    <Button
-        android:id="@+id/btnShowCalendar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/btn_show_calendar" />
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            android:title="AA"
+            app:layout_constraintTop_toTopOf="parent"
+            app:navigationIcon="@drawable/baseline_menu_24"/>
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-</LinearLayout>
+        <!-- Zawartość główna -->
+
+        <Button
+            android:id="@+id/btnAddMeal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/recyclerView"
+            android:text="@string/btn_add_meal"
+            app:layout_constraintBottom_toTopOf="@+id/btnShowMap"
+            tools:layout_editor_absoluteX="0dp" />
+
+        <Button
+            android:id="@+id/btnShowMap"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/btnAddMeal"
+            android:text="@string/btn_find_shop"
+            app:layout_constraintBottom_toTopOf="@+id/btnShowCalendar"
+            tools:layout_editor_absoluteX="0dp" />
+
+        <Button
+            android:id="@+id/btnShowCalendar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/btnShowMap"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="32dp"
+            android:text="@string/btn_show_calendar"
+            app:layout_constraintBottom_toBottomOf="parent"
+            tools:layout_editor_absoluteX="0dp" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_below="@+id/toolbar"
+            android:layout_marginTop="4dp"
+            app:layout_constraintBottom_toTopOf="@+id/btnAddMeal"
+            app:layout_constraintTop_toBottomOf="@+id/toolbar"
+            tools:layout_editor_absoluteX="0dp" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <com.google.android.material.navigation.NavigationView
+        android:id="@+id/nav_view"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        app:menu="@menu/drawer_menu" />
+
+</androidx.drawerlayout.widget.DrawerLayout>
+
+<!--<?xml version="1.0" encoding="utf-8"?>-->
+<!--<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"-->
+<!--    android:layout_width="match_parent"-->
+<!--    android:layout_height="match_parent"-->
+<!--    android:orientation="vertical"-->
+<!--    android:padding="16dp">-->
+
+
+<!--    <Button-->
+<!--        android:id="@+id/btnAddMeal"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:text="@string/btn_add_meal" />-->
+
+<!--    <Button-->
+<!--        android:id="@+id/btnShowMap"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:text="@string/btn_find_shop" />-->
+
+<!--    <Button-->
+<!--        android:id="@+id/btnShowCalendar"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:text="@string/btn_show_calendar" />-->
+
+<!--    <androidx.recyclerview.widget.RecyclerView-->
+<!--        android:id="@+id/recyclerView"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content" />-->
+<!--</LinearLayout>-->
