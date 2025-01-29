@@ -1,6 +1,7 @@
 package com.example.projekt;
 
 import android.app.DatePickerDialog;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
@@ -22,8 +23,6 @@ public class AddMealActivity extends AppCompatActivity {
 
     private EditText editTextName, editTextCalories, editTextDate;
     private Button btnAddMeal;
-//    private Button btnCancel;
-
     private AppDatabase database;
     private MealDao mealDao;
 
@@ -43,49 +42,44 @@ public class AddMealActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-//        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+
 
         toolbar.setNavigationOnClickListener(v -> {
             // Przejdź do MainActivity
             setResult(RESULT_CANCELED);
             finish();
         });
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-//            // Pobranie koloru z motywu
-//            TypedValue typedValue = new TypedValue();
-//            getTheme().resolveAttribute(android.R.attr.colorPrimary, typedValue, true);
-//            int primaryColor = typedValue.data;
-//
-//            // Ustawienie koloru status baru
-//            getWindow().setStatusBarColor(primaryColor);
-//        }
 
 
         editTextName = findViewById(R.id.editTextName);
         editTextCalories = findViewById(R.id.editTextCalories);
         editTextDate = findViewById(R.id.editTextDate);
         btnAddMeal = findViewById(R.id.btnAddMeal);
-//        btnCancel = findViewById(R.id.btnCancel);
 
         database = AppDatabase.getInstance(this);
         mealDao = database.mealDao();
 
         btnAddMeal.setOnClickListener(view -> addMeal());
 
-//        btnCancel.setOnClickListener(view -> {
-//            // Zamknij aktywność bez żadnych działań
-//            setResult(RESULT_CANCELED);
-//            finish();
-//        });
 
-        //
         Calendar calendar = Calendar.getInstance();
         int year = calendar.get(Calendar.YEAR);
         int month = calendar.get(Calendar.MONTH);
         int day = calendar.get(Calendar.DAY_OF_MONTH);
 
         String todayDate = year + "/" + (month + 1) + "/" + day;
-        editTextDate.setText(todayDate);
+//        editTextDate.setText(todayDate);
+
+        Intent intent = getIntent();
+        String selectedDateFromCalendarActivity = intent.getStringExtra("KEY_SELECTED_DATE");
+
+        if (selectedDateFromCalendarActivity == null) {
+            selectedDateFromCalendarActivity = todayDate; // Jeśli wartość jest null, przypisz wartość domyślną
+        }
+
+        editTextDate.setText(selectedDateFromCalendarActivity);
 
         //
         editTextDate.setOnClickListener(v -> {

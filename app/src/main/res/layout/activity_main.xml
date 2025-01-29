@@ -22,6 +22,19 @@
             app:titleTextColor="?attr/colorOnPrimary"
             tools:layout_editor_absoluteX="-16dp" />
 
+        <Button
+            android:id="@+id/btnAddMeal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:backgroundTint="?attr/colorOnPrimary"
+            android:text="@string/btn_add_meal"
+            android:textColor="?attr/colorPrimary"
+            android:visibility="visible"
+            app:layout_constraintEnd_toEndOf="@+id/toolbar"
+            app:layout_constraintTop_toTopOf="@+id/toolbar" />
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerView"
             android:layout_width="match_parent"

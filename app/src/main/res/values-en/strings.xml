@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Application name</string>
+    <string name="app_name">CaloriQ</string>
     <string name="open_drawer">Open menu</string>
     <string name="close_drawer">Close menu</string>
     <string name="meal_name">Meal name</string>

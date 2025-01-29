@@ -1,6 +1,7 @@
 package com.example.projekt;
 
 import android.app.AlertDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -10,6 +11,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.graphics.Insets;
@@ -34,9 +37,8 @@ public class CalendarActivity extends AppCompatActivity implements EditMealDialo
     private MealDao mealDao;
     private ImageView emptyListIcon;
     private TextView emptyListText;
-//    private Button goBack;
     private String selectedDate;
-
+    private Button btnAddMeal;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,7 +48,7 @@ public class CalendarActivity extends AppCompatActivity implements EditMealDialo
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-//        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         toolbar.setNavigationOnClickListener(v -> {
             // Przejdź do MainActivity
@@ -56,16 +58,15 @@ public class CalendarActivity extends AppCompatActivity implements EditMealDialo
 
         database = AppDatabase.getInstance(this);
         mealDao = database.mealDao();
-//        goBack = findViewById(R.id.goBack);
 
         // Inicjalizacja CalendarView i RecyclerView
         calendarView = findViewById(R.id.calendarView);
         recyclerViewMealsForDay = findViewById(R.id.recyclerViewMealsForDay);
         emptyListIcon = findViewById(R.id.emptyListIcon);
         emptyListText = findViewById(R.id.emptyListText);
+        btnAddMeal = findViewById(R.id.btnAddMeal);
 
         recyclerViewMealsForDay.setLayoutManager(new LinearLayoutManager(this));
-//        mealAdapter = new MealAdapter(mealListForDay);
 
         // Inicjalizowanie MealAdapter z listenerem
         mealAdapter = new MealAdapter(mealListForDay, meal -> {
@@ -75,6 +76,12 @@ public class CalendarActivity extends AppCompatActivity implements EditMealDialo
         recyclerViewMealsForDay.setAdapter(mealAdapter);
 
         setupSwipeToDelete();
+
+        btnAddMeal.setOnClickListener(v -> {
+            Intent intent = new Intent(CalendarActivity.this, AddMealActivity.class);
+            intent.putExtra("KEY_SELECTED_DATE", selectedDate);
+            addMealLauncher.launch(intent);
+        });
 
 
         LocalDate today = LocalDate.now();
@@ -87,12 +94,6 @@ public class CalendarActivity extends AppCompatActivity implements EditMealDialo
             selectedDate = year + "/" + (month + 1) + "/" + dayOfMonth; // Formatujemy datę na "YYYY/MM/DD"
             loadMealsForDate(selectedDate);
         });
-
-//        goBack.setOnClickListener(view -> {
-//            // Zamknij aktywność bez żadnych działań
-//            setResult(RESULT_OK);
-//            finish();
-//        });
     }
 
     private void loadMealsForDate(String date) {
@@ -110,7 +111,6 @@ public class CalendarActivity extends AppCompatActivity implements EditMealDialo
                     emptyListText.setVisibility(View.GONE);
                     recyclerViewMealsForDay.setVisibility(View.VISIBLE);
                 } else {
-//                    mealListForDay.add(new Meal("Brak posiłków", 0, date));
                     emptyListIcon.setVisibility(View.VISIBLE);
                     emptyListText.setVisibility(View.VISIBLE);
                     recyclerViewMealsForDay.setVisibility(View.GONE);
@@ -137,21 +137,9 @@ public class CalendarActivity extends AppCompatActivity implements EditMealDialo
             String currentlySelectedDate = getSelectedDateFromCalendar();
 
             mealDao.update(updatedMeal); // Zapisz zmiany w bazie danych
-//            runOnUiThread(() -> loadMealsForDate(updatedMeal.getDate())); // Odśwież listę
+
+            // Odśwież listę
             runOnUiThread(() -> {
-//                if (updatedMeal.getDate().equals(currentlySelectedDate)) {
-//                    // Jeśli posiłek należy do wybranej daty, odśwież listę dla tego dnia
-//                    loadMealsForDate(currentlySelectedDate);
-//                } else {
-//                    // Jeśli zmieniono datę na inną, usuń posiłek z listy aktualnego dnia
-//                    for (int i = 0; i < mealListForDay.size(); i++) {
-//                        if (mealListForDay.get(i).getId() == updatedMeal.getId()) {
-//                            mealListForDay.remove(i);
-//                            mealAdapter.notifyItemRemoved(i);
-//                            break;
-//                        }
-//                    }
-//                }
                 loadMealsForDate(selectedDate);
             });
         }).start();
@@ -211,4 +199,17 @@ public class CalendarActivity extends AppCompatActivity implements EditMealDialo
         System.out.println(selectedDate.format(formatter));
         return selectedDate.format(formatter);
     }
+
+    private final ActivityResultLauncher<Intent> addMealLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                if (result.getResultCode() == RESULT_OK) {
+                    // Odswież listę po dodaniu nowego posiłku
+                    loadMealsForDate(selectedDate);
+                }
+                else if (result.getResultCode() == RESULT_CANCELED) {
+                    Toast.makeText(this, "Dodawanie anulowane", Toast.LENGTH_SHORT).show();
+                }
+            }
+    );
 }
