@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Nazwa aplikacji</string>
+    <string name="app_name">CaloriQ</string>
     <string name="open_drawer">Otwórz menu</string>
     <string name="close_drawer">Zamknij menu</string>
     <string name="meal_name">Nazwa posiłku</string>
